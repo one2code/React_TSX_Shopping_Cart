@@ -8,7 +8,7 @@ export function Navbar() {
 				{/* Uses the Nav component from Bootstrap, which operates like Routes in React Router
 				Each Nav.Link operates like Route, with a link to the route. Instead of element={component} like vanilla routing in React Router, it uses as={NavLink} */}
 				<Nav className="me-auto">
-					<Nav.Link to="/h" as={NavLink}>
+					<Nav.Link to="/" as={NavLink}>
 						Home
 					</Nav.Link>
 					<Nav.Link to="/store" as={NavLink}>
