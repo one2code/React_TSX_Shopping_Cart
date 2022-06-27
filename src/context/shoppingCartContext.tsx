@@ -1,4 +1,5 @@
 import { createContext, ReactNode, useContext, useState } from "react";
+import { ShoppingCart } from "../components/ShoppingCart";
 
 
 type ShoppingCartProviderTypes = {
@@ -6,10 +7,14 @@ type ShoppingCartProviderTypes = {
 };
 
 type ShoppingCartContext = {
+    openCart: () => void;
+    closeCart: () => void;
 	getItemQuantity: (id: number) => number;
 	increaseCartQuantity: (id: number) => void;
 	decreaseCartQuantity: (id: number) => void;
 	removeFromCart: (id: number) => void;
+    cartQuantity: number;
+    cartItems: CartItem[];
 };
 
 type CartItem = {
@@ -23,12 +28,22 @@ export function useShoppingCart() {
 }
 
 export function ShoppingCartProvider({ children }: ShoppingCartProviderTypes) {
-	const [cartItems, setCartItems] = useState<CartItem[]>([]);
+	const [isOpen, setIsOpen] = useState(false)
+    const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
+    // Logic for the shopping cart quantity
+    const cartQuantity = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+
+    // Opens and closes the cart when clicked
+    const openCart = () => setIsOpen(true);
+    const closeCart = () => setIsOpen(false);
+
+    // Logic for the item quantity in the shopping cart
 	function getItemQuantity(id: number) {
 		return cartItems.find((item) => item.id === id)?.quantity || 0;
 	}
 
+    // Logic for increasing the quantity of an item in the shopping cart. Starts at a default of 1 when instantiated, and then incrementally adds to the quantity with each successive click.
 	function increaseCartQuantity(id: number) {
 		setCartItems((currentItems) => {
 			if (currentItems.find((item) => item.id === id) == null) {
@@ -43,6 +58,8 @@ export function ShoppingCartProvider({ children }: ShoppingCartProviderTypes) {
 			}
 		});
 	}
+
+    // Logic for decreasing the quantity of an item in the shopping cart. Starts at a default of 1 when instantiated, and then decrements the quantity with each successive click.
 	function decreaseCartQuantity(id: number) {
 		const item = cartItems.find((item) => item.id === id);
 		setCartItems((currentItems) => {
@@ -59,6 +76,7 @@ export function ShoppingCartProvider({ children }: ShoppingCartProviderTypes) {
 		});
 	}
 
+    // Logic for removing an item from the shopping cart.
     function removeFromCart(id: number) {
         setCartItems((currentItems) => currentItems.filter((item) => item.id !== id));
     }
@@ -70,9 +88,14 @@ export function ShoppingCartProvider({ children }: ShoppingCartProviderTypes) {
 				increaseCartQuantity,
 				decreaseCartQuantity,
 				removeFromCart,
+                cartItems,
+                cartQuantity,
+                openCart,
+                closeCart
 			}}
 		>
 			{children}
+            <ShoppingCart isOpen = {isOpen}/>
 		</ShoppingCartContext.Provider>
 	);
 }
